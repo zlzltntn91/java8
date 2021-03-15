@@ -1,0 +1,141 @@
+# Lambda Expression
+
+JDK 1.8에 추가
+
+- 메서드를 하나의 식(expression)으로 표현한것
+- 메서드를 람다식으로 표현하면 메서드의 __이름__ 이 없어지므로, 람다식을 '익명함수(anonymous function)'라고 함
+- 반환 타입이 없음
+
+메서드의 매개변수로 전달될 수 있고 메서드의 결과로 반환될 수 있으며 이로인해 메서드를 변수처럼 다루는 것이 가능해짐
+
+> 메서드와 함수의 차이
+> 
+> 함수라는 이름은 수학에서 가져온 것이며 개념이 유사함.
+> 객체지향의 개념에서는 함수 대신 객체의 행위나 동작을 의미하는 메서드라는 용어를 사용함
+>
+> 메서드는 함수와 같은 의미지만 특정 클래스에 반드시 속해야 한다는 제약이있음
+> 하지만 람다식은 메서드가 하나의 독립적인 기능을 하기 때문에 함수라는 용어가 사용됨
+
+### 람다식 작성
+- 람다식에 선언된 매개변수의 타입은 추론이 가능한 경우는 생략할 수 있음, 반환타입이 없는 이유도 항상 추론이 가능하기 때문
+- 익명함수답게 메서드에서 이름과 반환타입을 제거, 선언부와 몸통사이에 ->를 추가
+```java
+int sum(int a, int b){
+	return a + b;
+}
+
+(int a, int b) -> {return a + b;}
+```
+- 반환값이 있는 메서드의 경우, return문 대신 식으로 대신할 수 있음, 식의 연산결과가 자동적으로 반환값이됨. 이때 문장이 아닌 식이므로 끝에 ;를 붙이지 않음
+ ```java
+(int a, int b) -> a + b
+(int a, int b) -> {return a + b;}
+```
+- 선언된 매개변수가 하나일 경우 괄호 생략가능, 단 매개변수의 타입을 선언했다면 괄호를 생략할 수 없음
+```java
+a -> a * a
+(int a) -> a * a
+```
+- 괄호 안의 문장이 하나일 때는 괄호를 생략할 수 있음, 문장의 끝에 ;을 붙이지 않으며 return 문일 경우 괄호는 생략할 수 없음
+```java
+a, b -> a + b
+a, b -> {return a + b;}
+```
+
+### 함수형 인터페이스 (functional interface)
+ - 람다식은 익명클래스의 객체와 동등하다.
+```java
+public void 익명클래스(){
+
+		AnonymousClass anonymousClass = new AnonymousClass() {
+			@Override
+			public void hello() {
+				System.out.println("hello Anonymous");
+			}
+		};
+
+		AnonymousClass lambda = () -> System.out.println("hello anonymous");
+
+		anonymousClass.hello();
+		lambda.hello();
+}
+```
+ - 람다식으로 정의된 익명 객체의 메서드를 어떻게 호출 할 수 있을까?
+  참조변수가 있어야 객체의 메서드를 호출 할 수 있을탠데 람다식의 참조변수는 뭐라고 해야할까?
+```java
+타입 f = (a, b) -> a > b ? a : b;
+```
+1. 참조변수 f의 타입은 참조형이므로 클래스 또는 인터페이스가 가능함.
+2. 람다식과 동등한 메서드가 정의되어 있어야 참조변수로 익명 객체(람다식)의 메서드를 호출할 수 있음
+```java
+interface AnonymousClass {
+	void hello();
+}
+
+@Test
+void 익명클래스2() {
+  AnonymousClass anonymousClass = () -> System.out.println("람다");
+  anonymousClass.hello();
+}
+```
+3. 매개변수의 타입, 개수, 반환값이 일치할 경우 대체가 가능
+4. 함수형 인터페이스는 오직 하나의 추상 메서드만 정의되어 있어야함, 단 static 메서드와 default 메서드는 개수의 제한이 없음
+- @FunctionalInterface를 붙일 경우 컴파일러가 함수형 인터페이스를 올바르게 정의하였는지 확인해 줌 
+
+### 외부 변수를 참조하는 람다식
+람다식 내에서 참조하는 지역변수는 final이 붙지 않았어도 상수로 간주되며 람다식 내에서 참조하고 있는 지역 변수는
+식 내에서나 다른 어느 곳에서도 변수의 값을 변경하는 일은 허용하지 않는다.
+```java
+    int classVariable = 5;
+
+    @Test
+    public void 람다식의지역변수참조() {
+      int c = 1; // == final int c = 1;
+  
+      FunctionSum sum = (a, b) -> {
+        a = a + 20;
+        classVariable = 50;
+        return a + b + classVariable + c;
+      };
+  
+      log.info("result :{}", sum.sum(3, 5));
+    }
+```
+### java.util.function 패키지
+
+일반적으로 자주 쓰이는 형식의 메서드를 함수형 인터페이스로 미리 정의해 둠, 가능한 이 패키지의 인터페이스를 활용하라
+```text
+Runnable : void run()
+파라미터와 리턴값 없음
+
+Supplier<T> : T get()
+리턴값만 있음
+
+Consumer<T> : void accept(T t)
+파라미터만 있음
+
+Function<T, R> : R apply(T t)
+파라미터와 리턴값 있음 
+
+Predicate <T> : boolean test(T t)
+파라미터와 리턴값이 있고 리턴타입은 boolean, 조건식을 람다로 표현할때 사용한다.
+```
+#### 파라미터가 두개인 함수형 인터페이스
+2개인 경우 함수인터페이스에 Bi가 붙음, 보통 파라미터 타입으로 T를 사용하므로 알파벳순 T, U, V, W가 파라미터의 타입으로 사용됨
+```text
+BiConsumer<T, U> : accept(T t, U u)
+BiPredicate<T, U> : test(T t, U u)
+BiFunction<T, U, R> : R apply(T t, U u)
+Supplier의 경우 파라미터가 없는 메서드를 갖고있고 리턴타입이 두개가 될순 없으므로 Bi는 존재하지 않음
+```
+리턴타입이 3개 이상 필요할경우 직접 선언하여 만들어야함
+```text
+UnaryOperator<T> T apply(T t) : Function의 sub
+BinaryOperator<T> T apply(T t, T t2) : BiFunction의 sub
+```
+
+
+
+
+
+

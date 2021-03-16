@@ -1,3 +1,5 @@
+package lambda.testclass;
+
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -16,7 +18,7 @@ interface FunctionSum {
 public class Lambda {
 
 
-
+	int classVariable = 5;
 
 	@Test
 	public void 메서드를람다식으로() {
@@ -48,7 +50,7 @@ public class Lambda {
 	void printVar(String name, int i) {
 		log.info(name + "=" + i);
 	}
-	int classVariable = 5;
+
 	@Test
 	public void 람다식의지역변수참조() {
 		int c = 1; // == final int c = 1;

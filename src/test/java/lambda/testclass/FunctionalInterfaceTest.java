@@ -1,9 +1,9 @@
+package lambda.testclass;
+
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.util.function.*;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @Slf4j
 public class FunctionalInterfaceTest {
@@ -13,6 +13,8 @@ public class FunctionalInterfaceTest {
 		Function<String, String> f = (s) -> s.concat(" world");
 		BiFunction<String, String, String> f2 = (s, s2) -> s.concat(s2);
 
+		BiFunction<String, String, Boolean> function = String::equals;
+		log.info(String.valueOf(function.apply("김은수", "김은수")));
 		log.info(f.apply("Hello"));
 		log.info(f2.apply("Hola", " mundo"));
 	}
@@ -33,10 +35,10 @@ public class FunctionalInterfaceTest {
 
 	@Test
 	public void predicate_BiPredicate() {
-		Predicate<String> predicate = v	-> v.equals("김은수");
+		Predicate<String> predicate = v -> v.equals("김은수");
 		log.info(predicate.test("김은수") + "");
 
-		BiPredicate<String, String>	biPredicate = (v, u) -> v.equals(u);
+		BiPredicate<String, String> biPredicate = (v, u) -> v.equals(u);
 		log.info(String.valueOf(biPredicate.test("김은수", "김은수")));
 	}
 

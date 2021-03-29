@@ -8,15 +8,18 @@ import org.junit.Before;
 import org.junit.Test;
 import stream.ex.Student;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.stream.Collectors.groupingBy;
 
 @Slf4j
 public class GroupingTest {
 	Student[] stuArr;
+	ObjectMapper mapper = new ObjectMapper();
+
+	{
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+	}
 
 	@Before
 	public void setUp() {
@@ -43,19 +46,32 @@ public class GroupingTest {
 		};
 	}
 
-	ObjectMapper mapper = new ObjectMapper();
-	{
-		mapper.enable(SerializationFeature.INDENT_OUTPUT);
-	}
-
 	@Test
 	public void basic() throws JsonProcessingException {
 		Arrays.stream(stuArr).collect(groupingBy(Student::getHak))
 				.forEach((v, v2) -> System.out.println(v + "학년 :" + v2.size() + "//" + v2));
 
 		Map<Integer, Map<Integer, List<Student>>> res = Arrays.stream(stuArr).collect(groupingBy(Student::getHak,
-																								 groupingBy(Student::getBan)));
+																								 groupingBy(
+																										 Student::getBan)));
 		log.info(mapper.writeValueAsString(res));
+
+
 	}
+
+	@Test
+	public void 아이띵크() {
+		Arrays.stream(stuArr).collect(ArrayList::new,
+									  (objects, student) -> {
+											HashMap<String, Object> stu = new HashMap<>();
+											stu.put("학년", student.getHak());
+											stu.put("data", student);
+											objects.add(stu);
+									  }
+									  , ArrayList::addAll)
+				.forEach((v) -> System.out.println(v + " // "));
+
+	}
+
 
 }

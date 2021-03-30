@@ -9,6 +9,7 @@ import org.junit.Test;
 import stream.ex.Student;
 
 import java.util.*;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -60,18 +61,31 @@ public class GroupingTest {
 	}
 
 	@Test
-	public void 아이띵크() {
-		Arrays.stream(stuArr).collect(ArrayList::new,
-									  (objects, student) -> {
-											HashMap<String, Object> stu = new HashMap<>();
-											stu.put("학년", student.getHak());
-											stu.put("data", student);
-											objects.add(stu);
-									  }
-									  , ArrayList::addAll)
-				.forEach((v) -> System.out.println(v + " // "));
+	public void 아이띵크() throws JsonProcessingException {
+		List<Map<String, Object>> list = Arrays.stream(stuArr).collect(ArrayList::new,
+																	   (objects, student) -> {
+																		   HashMap<String, Object> stu = new HashMap<>();
+																		   stu.put("학년", student.getHak());
+																		   stu.put("data", student);
+																		   objects.add(stu);
+																	   }
+				, ArrayList::addAll);
+		log.info(mapper.writeValueAsString(list));
+
+		 Map<String, List<Map<String, ?>>> listMap = list.stream().collect(groupingBy(v -> v.get("학년").toString()));
+		 log.info(listMap.get("2").toString());
 
 	}
 
+
+	@Test
+	public void 써머리(){
+		IntSummaryStatistics scoreStat = Arrays.stream(stuArr).mapToInt(v -> v.getScore()).summaryStatistics();
+		log.info(String.valueOf(scoreStat.getSum()));
+		log.info(String.valueOf(scoreStat.getMax()));
+		log.info(String.valueOf(scoreStat.getMin()));
+		log.info(String.valueOf(scoreStat.getAverage()));
+		log.info(String.valueOf(scoreStat.getCount()));
+	}
 
 }

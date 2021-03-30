@@ -1,7 +1,11 @@
 package stream.testclass;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Before;
 import org.junit.Test;
+import stream.ex.Student;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +14,8 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingInt;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
@@ -74,9 +80,50 @@ public class IntermidiateOperation {
 		int[] sortedArr = Arrays.stream(arr).sorted().toArray();
 		Stream<String> stringStream = Stream.of("무", "야", "히히", "호", "1234", "가가");
 		log.info(Arrays.toString(sortedArr));
-		stringStream.sorted(Comparator.comparing((v) -> v.length(), Comparator.comparing((v) -> {
+		stringStream.sorted(comparing((v) -> v.length(), comparing((v) -> {
 			return v.intValue();
 		}))).forEach(System.out::println);
+	}
+
+	Student[] stuArr;
+	ObjectMapper mapper = new ObjectMapper();
+
+	{
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+	}
+
+	@Before
+	public void setUp() {
+		stuArr = new Student[]{
+				new Student("나자바", true, 1, 1, 300),
+				new Student("김지미", false, 1, 1, 250),
+				new Student("김자바", true, 1, 1, 200),
+				new Student("이지미", false, 1, 2, 150),
+				new Student("남자바", true, 1, 2, 100),
+				new Student("안지미", false, 1, 2, 50),
+				new Student("황지미", false, 1, 3, 100),
+				new Student("강지미", false, 1, 3, 150),
+				new Student("이자바", true, 1, 3, 200),
+
+				new Student("나자바", true, 2, 1, 300),
+				new Student("김지미", false, 2, 1, 250),
+				new Student("김자바", true, 2, 1, 200),
+				new Student("이지미", false, 2, 2, 150),
+				new Student("남자바", true, 2, 2, 100),
+				new Student("안지미", false, 2, 2, 50),
+				new Student("황지미", false, 2, 3, 100),
+				new Student("강지미", false, 2, 3, 150),
+				new Student("이자바", true, 2, 3, 200)
+		};
+	}
+
+	@Test
+	public void 덴컴페어링(){
+		Arrays.stream(stuArr).sorted(Comparator.<Student>comparingInt(v -> v.getHak())
+									 .thenComparingInt(v -> v.getBan())
+									 .thenComparingInt(v -> v.getScore())
+		).forEach(System.out::println);
+
 	}
 
 }
